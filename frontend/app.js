@@ -1,13 +1,15 @@
+const API = "http://localhost:8000";
+
 const TABS = {
   cars: {
-    label: "Автомобили", url: "/cars",
+    label: "Автомобили", url: API + "/cars",
     cols: ["id","brand","model","year","mileage"],
     head: ["ID","Марка","Модель","Год","Пробег"],
     form: [["brand","Марка","text",1],["model","Модель","text",1],
            ["year","Год","number"],["mileage","Пробег","number"]]
   },
   records: {
-    label: "Записи", url: "/records",
+    label: "Записи", url: API + "/records",
     cols: ["id","car_id","date","kind","cost","note"],
     head: ["ID","ID авто","Дата","Тип","Цена","Заметка"],
     form: [["car_id","ID авто","number",1],["date","Дата","date",1],

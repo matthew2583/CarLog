@@ -6,10 +6,17 @@ from decimal import Decimal
 from datetime import date
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 app = FastAPI(title="CarLog")
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=os.environ.get("CORS_ORIGINS", "http://localhost:8080").split(","),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class Car(BaseModel):
     brand: str
@@ -112,6 +119,3 @@ def update_record(record_id: int, record: Record):
 @app.delete("/records/{record_id}")
 def delete_record(record_id: int):
     return found(sql("DELETE FROM records WHERE id = %s RETURNING *", (record_id,)))
-
-
-app.mount("/", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "..", "frontend"), html=True))
