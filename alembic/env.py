@@ -1,10 +1,9 @@
-import os
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
+from backend.config import config as app_config
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -12,7 +11,7 @@ config = context.config
 
 config.set_main_option(
     "sqlalchemy.url",
-    os.environ.get("DATABASE_URL").replace("postgresql://", "postgresql+psycopg://", 1),
+    app_config.DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1),
 )
 
 # Interpret the config file for Python logging.
