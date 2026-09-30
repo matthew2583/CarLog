@@ -10,7 +10,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from backend.config import config
 
-log = logging.getLogger("CarLog")
+log = logging.getLogger("carlog.auth")
 
 bearer = HTTPBearer(auto_error=True)
 

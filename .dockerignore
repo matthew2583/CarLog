@@ -1,0 +1,10 @@
+.env
+.env.*
+.vscode
+.git
+.gitignore
+__pycache__
+**/__pycache__
+.ruff_cache
+frontend
+*.md
