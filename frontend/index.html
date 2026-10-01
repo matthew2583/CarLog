@@ -4,17 +4,48 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CarLog - учёт автомобиля</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="app.js" defer></script>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <h1>CarLog</h1>
-  <nav id="tabs"></nav>
+  <header>
+    <h1>CarLog</h1>
+    <div id="user" hidden>
+      <span id="username"></span>
+      <button id="logout" class="btn btn-cancel btn-sm">Выйти</button>
+    </div>
+  </header>
+
   <p id="error" hidden></p>
-  <table>
-    <thead id="table-head"></thead>
-    <tbody id="table-body"></tbody>
-  </table>
-  <form id="form"></form>
+
+  <section id="auth-view" hidden>
+    <form id="auth-form">
+      <h3>Вход в CarLog</h3>
+      <label><span>Имя пользователя</span>
+        <input name="username" required minlength="3" maxlength="32" autocomplete="username"></label>
+      <label><span>Пароль</span>
+        <input name="password" type="password" required minlength="6" maxlength="128" autocomplete="current-password"></label>
+      <div class="form-actions">
+        <button type="submit" data-action="login" class="btn btn-ok">Войти</button>
+        <button type="submit" data-action="register" class="btn btn-cancel">Зарегистрироваться</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="main-view" hidden>
+    <nav id="tabs"></nav>
+    <div id="filters"></div>
+    <table>
+      <thead id="table-head"></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    <div id="stats"></div>
+    <form id="form"></form>
+  </section>
+
+  <script src="js/config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

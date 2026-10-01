@@ -81,7 +81,7 @@ def create_record(record: Record, user_id: int = Depends(current_user_id)):
 def update_record(
     record_id: int, record: Record, user_id: int = Depends(current_user_id)
 ):
-    car = own_car(record.car_id, user_id)  
+    car = own_car(record.car_id, user_id)
     check_record_date(record, car)
     return found(
         sql(
