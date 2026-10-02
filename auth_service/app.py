@@ -3,9 +3,9 @@ import logging
 from fastapi import APIRouter, FastAPI, HTTPException
 
 from auth_service.auth import create_token, hash_password, verify_password
-from auth_service.config import config
-from auth_service.db import sql
 from auth_service.models import Credentials
+from common.config import config
+from common.db import sql
 from common.logging_setup import setup_logging
 
 setup_logging(config.LOG_LEVEL)

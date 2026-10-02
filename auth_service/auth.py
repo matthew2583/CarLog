@@ -5,7 +5,7 @@ import time
 
 import jwt
 
-from auth_service.config import config
+from common.config import config
 
 
 def hash_password(password: str):

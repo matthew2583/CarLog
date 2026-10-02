@@ -4,7 +4,7 @@ import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from backend.config import config
+from common.config import config
 
 log = logging.getLogger("carlog.auth")
 

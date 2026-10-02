@@ -4,8 +4,8 @@ from decimal import Decimal
 
 from fastapi import HTTPException
 
-from backend.db import found, sql
 from backend.models import Record
+from common.db import found, sql
 
 log = logging.getLogger("carlog.services")
 

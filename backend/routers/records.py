@@ -4,9 +4,9 @@ from datetime import date
 from fastapi import APIRouter, Depends, HTTPException
 
 from backend.auth import current_user_id
-from backend.db import found, sql
 from backend.models import KINDS, Record
 from backend.services import check_record_date, own_car
+from common.db import found, sql
 
 log = logging.getLogger("carlog.records")
 router = APIRouter(tags=["records"])

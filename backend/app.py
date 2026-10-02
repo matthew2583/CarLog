@@ -2,8 +2,8 @@ import logging
 
 from fastapi import FastAPI
 
-from backend.config import config
 from backend.routers import cars, records
+from common.config import config
 from common.logging_setup import setup_logging
 
 setup_logging(config.LOG_LEVEL)

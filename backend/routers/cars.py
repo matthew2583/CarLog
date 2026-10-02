@@ -3,9 +3,9 @@ import logging
 from fastapi import APIRouter, Depends
 
 from backend.auth import current_user_id
-from backend.db import found, sql
 from backend.models import Car
 from backend.services import build_car_stats, check_mileage, own_car
+from common.db import found, sql
 
 log = logging.getLogger("carlog.cars")
 router = APIRouter(prefix="/cars", tags=["cars"])
