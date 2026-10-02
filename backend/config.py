@@ -14,7 +14,6 @@ class Config(BaseSettings):
     LOG_LEVEL: str = "INFO"
     JWT_SECRET: str = "secret"
     TOKEN_TTL_MIN: int = 60
-    CORS_ORIGINS: str = "http://localhost:8080"
 
 
 config = Config()
