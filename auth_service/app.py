@@ -1,12 +1,16 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, FastAPI, HTTPException
 
-from backend.auth import create_token, hash_password, verify_password
-from backend.db import sql
-from backend.models import Credentials
+from auth_service.auth import create_token, hash_password, verify_password
+from auth_service.config import config
+from auth_service.db import sql
+from auth_service.models import Credentials
+from common.logging_setup import setup_logging
 
-log = logging.getLogger("carlog.users")
+setup_logging(config.LOG_LEVEL)
+log = logging.getLogger("auth_service")
+
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
@@ -36,3 +40,8 @@ def login(data: Credentials):
         raise HTTPException(401, "Неверное имя пользователя или пароль")
     log.info("Вход пользователя %s (id=%s)", username, user["id"])
     return token_response(user["id"])
+
+
+app = FastAPI(title="CarLog Auth", root_path="/api/auth")
+app.include_router(router)
+log.info("Auth service запущен")

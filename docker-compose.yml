@@ -36,6 +36,19 @@ services:
         condition: service_completed_successfully
     networks:
       - dev_net
+
+  auth-service:
+    build: .
+    command: sh -c "exec uvicorn auth_service.app:app --host 0.0.0.0 --port ${AUTH_PORT}"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - dev_net
     
   frontend:
     build: ./frontend
@@ -56,6 +69,7 @@ services:
       - "${GATEWAY_PORT}:${GATEWAY_CONTAINER_PORT}"
     depends_on:
       - backend
+      - auth-service
       - frontend
     networks:
       - dev_net

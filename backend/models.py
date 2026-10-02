@@ -7,11 +7,6 @@ KINDS = ["ТО", "Ремонт", "Заправка", "Страховка", "Мо
 MIN_YEAR = 1950
 
 
-class Credentials(BaseModel):
-    username: str = Field(min_length=3, max_length=32)
-    password: str = Field(min_length=6, max_length=128)
-
-
 class Car(BaseModel):
     brand: str = Field(max_length=50)
     model: str = Field(max_length=50)
