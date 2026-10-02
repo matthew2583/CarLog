@@ -10,7 +10,7 @@ class Config(BaseSettings):
     POSTGRES_PASSWORD: str = "carlog123"
     POSTGRES_DB: str = "carlog"
     DATABASE_URL: str = "postgresql://carlog:carlog123@localhost:5432/carlog"
-    PORT: int = 8000
+    BACKEND_PORT: int = 8000
     LOG_LEVEL: str = "INFO"
     JWT_SECRET: str = "secret"
     TOKEN_TTL_MIN: int = 60

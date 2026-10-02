@@ -11,4 +11,4 @@ RUN poetry install --no-root
 
 COPY . .
 
-CMD ["sh", "-c", "exec uvicorn backend.app:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "exec uvicorn backend.app:app --host 0.0.0.0 --port ${BACKEND_PORT}"]

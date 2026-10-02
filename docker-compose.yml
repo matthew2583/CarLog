@@ -31,8 +31,6 @@ services:
       - .env
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-    ports:
-      - "${PORT:-8000}:8000"
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -41,6 +39,8 @@ services:
     
   frontend:
     build: ./frontend
+    env_file:
+      - .env
     depends_on:
       - backend
     networks:
@@ -48,10 +48,12 @@ services:
     
   gateway:
     image: nginx:1.27-alpine
+    env_file:
+      - .env
     volumes:
-      - ./gateway/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./gateway/nginx.conf:/etc/nginx/templates/default.conf.template:ro
     ports:
-      - "${GATEWAY_PORT:-8080}:80"
+      - "${GATEWAY_PORT}:${GATEWAY_CONTAINER_PORT}"
     depends_on:
       - backend
       - frontend

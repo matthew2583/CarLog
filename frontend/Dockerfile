@@ -1,4 +1,4 @@
 FROM python:3.14-slim
 WORKDIR /srv
 COPY . .
-CMD ["python", "-m", "http.server", "80"]
+CMD ["sh", "-c", "exec python -m http.server ${FRONTEND_PORT}"]
