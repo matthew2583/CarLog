@@ -34,7 +34,7 @@ def check_record_date(record: Record, car: dict):
         )
 
 
-def months_between(first: date, last: date) -> int:
+def months_between(first: date, last: date):
     return (last.year - first.year) * 12 + (last.month - first.month) + 1
 
 

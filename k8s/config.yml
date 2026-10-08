@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: carlog-config
+  namespace: carlog
+data:
+  BACKEND_PORT: "8000"
+  AUTH_PORT: "8001"
+  FRONTEND_PORT: "80"
+  GATEWAY_CONTAINER_PORT: "80"
+  LOG_LEVEL: "INFO"
+  TOKEN_TTL_MIN: "60"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: carlog-secrets
+  namespace: carlog
+stringData:
+  POSTGRES_USER: carlog
+  POSTGRES_DB: carlog
+  POSTGRES_PASSWORD: carlog123
+  DATABASE_URL: postgresql://carlog:carlog123@db:5432/carlog
+  JWT_SECRET: secret
