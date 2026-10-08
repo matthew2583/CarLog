@@ -4,6 +4,7 @@ metadata:
   name: frontend
   namespace: carlog
 spec:
+  type: ClusterIP
   selector:
     app: frontend
   ports:

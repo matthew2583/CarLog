@@ -5,6 +5,7 @@ metadata:
   namespace: carlog
 spec:
   backoffLimit: 4
+  activeDeadlineSeconds: 180
   template:
     spec:
       restartPolicy: Never

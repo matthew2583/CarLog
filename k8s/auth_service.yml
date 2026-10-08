@@ -4,6 +4,7 @@ metadata:
   name: auth-service
   namespace: carlog
 spec:
+  type: ClusterIP
   selector:
     app: auth-service
   ports:

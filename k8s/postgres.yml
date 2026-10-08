@@ -4,6 +4,7 @@ metadata:
   name: db
   namespace: carlog
 spec:
+  type: ClusterIP
   selector:
     app: db
   ports:
