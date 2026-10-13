@@ -38,8 +38,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: carlog-config
-            - secretRef:
-                name: carlog-secrets
           ports:
             - containerPort: 80
           readinessProbe:
