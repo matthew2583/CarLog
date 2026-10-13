@@ -8,7 +8,7 @@ from common.config import config
 from common.db import sql
 from common.logging_setup import setup_logging
 
-setup_logging(config.LOG_LEVEL)
+setup_logging(config.LOG_LEVEL, "auth-service")
 log = logging.getLogger("auth_service")
 
 router = APIRouter(prefix="/auth", tags=["auth"])

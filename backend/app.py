@@ -6,7 +6,7 @@ from backend.routers import cars, records
 from common.config import config
 from common.logging_setup import setup_logging
 
-setup_logging(config.LOG_LEVEL)
+setup_logging(config.LOG_LEVEL, "backend")
 log = logging.getLogger("carlog")
 
 app = FastAPI(title="CarLog", root_path="/api")
