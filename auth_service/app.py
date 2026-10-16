@@ -6,7 +6,7 @@ from auth_service.auth import create_token, hash_password, verify_password
 from auth_service.models import Credentials
 from common.config import config
 from common.db import sql
-from common.logging_setup import setup_logging
+from common.logging_setup import add_request_logging, setup_logging
 
 setup_logging(config.LOG_LEVEL, "auth-service")
 log = logging.getLogger("auth_service")
@@ -27,7 +27,7 @@ def register(data: Credentials):
         "INSERT INTO users (username, password_hash) VALUES (%s, %s) RETURNING id",
         (username, hash_password(data.password)),
     )
-    log.info("Зарегистрирован пользователь %s (id=%s)", username, user["id"])
+    log.info("Пользователь зарегистрирован", extra={"fields": {"user.id": user["id"]}})
     return token_response(user["id"])
 
 
@@ -36,12 +36,13 @@ def login(data: Credentials):
     username = data.username.strip()
     user = sql("SELECT id, password_hash FROM users WHERE username = %s", (username,))
     if not user or not verify_password(data.password, user["password_hash"]):
-        log.warning("Неудачная попытка входа: %s", username)
+        log.warning("Вход отклонён")
         raise HTTPException(401, "Неверное имя пользователя или пароль")
-    log.info("Вход пользователя %s (id=%s)", username, user["id"])
+    log.info("Пользователь вошёл в систему", extra={"fields": {"user.id": user["id"]}})
     return token_response(user["id"])
 
 
 app = FastAPI(title="CarLog Auth", root_path="/api/auth")
+add_request_logging(app)
 app.include_router(router)
-log.info("Auth service запущен")
+log.info("Сервис авторизации запущен")

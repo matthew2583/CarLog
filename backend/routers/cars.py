@@ -31,11 +31,8 @@ def create_car(car: Car, user_id: int = Depends(current_user_id)):
         (car.brand, car.model, car.year, car.mileage, user_id),
     )
     log.info(
-        "Пользователь %d создал машину: %s %s (id: %d)",
-        user_id,
-        car.brand,
-        car.model,
-        created["id"],
+        "Автомобиль создан",
+        extra={"fields": {"car.id": created["id"], "user.id": user_id}},
     )
     return created
 
@@ -61,11 +58,8 @@ def delete_car(car_id: int, user_id: int = Depends(current_user_id)):
         )
     )
     log.info(
-        "Пользователь %d удалил машину: %s %s (id: %d)",
-        user_id,
-        deleted["brand"],
-        deleted["model"],
-        car_id,
+        "Автомобиль удалён",
+        extra={"fields": {"car.id": car_id, "user.id": user_id}},
     )
     return deleted
 

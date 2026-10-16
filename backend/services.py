@@ -18,7 +18,10 @@ def own_car(car_id: int, user_id: int):
 
 def check_mileage(car: dict, new_mileage: int):
     if new_mileage < car["mileage"]:
-        log.info("Отклонено уменьшение пробега авто id=%s", car["id"])
+        log.info(
+            "Уменьшение пробега отклонено",
+            extra={"fields": {"car.id": car["id"]}},
+        )
         raise HTTPException(
             409, f"Пробег не может быть меньше текущего ({car['mileage']})"
         )
@@ -27,7 +30,8 @@ def check_mileage(car: dict, new_mileage: int):
 def check_record_date(record: Record, car: dict):
     if car["year"] and record.date.year < car["year"]:
         log.info(
-            "Отклонена запись: дата %s раньше года выпуска %s", record.date, car["year"]
+            "Дата записи отклонена",
+            extra={"fields": {"car.id": car["id"], "car.year": car["year"]}},
         )
         raise HTTPException(
             422, f"Дата записи раньше года выпуска автомобиля ({car['year']})"

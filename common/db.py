@@ -18,7 +18,10 @@ def sql(query, args=(), many=False):
             cursor = connection.execute(query, args)
             return cursor.fetchall() if many else cursor.fetchone()
     except IntegrityError as error:
-        log.warning("Нарушение целостности БД: %s", str(error).splitlines()[0])
+        log.warning(
+            "Нарушено ограничение целостности базы данных",
+            extra={"fields": {"error.type": type(error).__name__}},
+        )
         raise HTTPException(409, str(error).splitlines()[0])
     except OperationalError:
         log.exception("База данных недоступна")

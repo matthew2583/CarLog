@@ -69,10 +69,8 @@ def create_record(record: Record, user_id: int = Depends(current_user_id)):
         (record.car_id, record.date, record.kind, record.cost, record.note),
     )
     log.info(
-        "Пользователь %d создал запись: %s (id: %d)",
-        user_id,
-        record.kind,
-        created["id"],
+        "Запись обслуживания создана",
+        extra={"fields": {"record.id": created["id"], "record.kind": record.kind}},
     )
     return created
 
@@ -111,9 +109,7 @@ def delete_record(record_id: int, user_id: int = Depends(current_user_id)):
         )
     )
     log.info(
-        "Пользователь %d удалил запись: %s (id: %d)",
-        user_id,
-        deleted["kind"],
-        record_id,
+        "Запись обслуживания удалена",
+        extra={"fields": {"record.id": record_id, "record.kind": deleted["kind"]}},
     )
     return deleted
