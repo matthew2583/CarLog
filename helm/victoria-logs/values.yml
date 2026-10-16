@@ -1,0 +1,26 @@
+server:
+  retentionPeriod: 7d
+  persistentVolume:
+    enabled: true
+    size: 2Gi
+
+vector:
+  enabled: true
+  customConfig:
+    sources:
+      k8s:
+        extra_field_selector: "metadata.namespace=carlog"
+    transforms:
+      parser:
+        type: remap
+        inputs: [k8s]
+        source: |
+          structured, err = parse_json(.message)
+          if err == null && is_object(structured) {
+            . = merge(., object!(structured))
+          } else {
+            .parse_error = true   
+          }
+          .service = .kubernetes.pod_labels.app
+          .env = "minikube"
+          .message = redact(string!(.message), filters: [r'[\w.+-]+@[\w-]+\.[\w.]+'])
