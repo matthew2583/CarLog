@@ -24,3 +24,8 @@ vector:
           .service = .kubernetes.pod_labels.app
           .env = "minikube"
           .message = redact(string!(.message), filters: [r'[\w.+-]+@[\w-]+\.[\w.]+'])
+    sinks:                      # тот же отступ, что у sources и transforms
+      vlogs:
+        request:
+          headers:
+            VL-Stream-Fields: service,kubernetes.container_name
