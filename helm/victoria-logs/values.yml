@@ -1,11 +1,25 @@
 server:
   retentionPeriod: 7d
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
   persistentVolume:
     enabled: true
     size: 2Gi
 
 vector:
   enabled: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
   customConfig:
     sources:
       k8s:
@@ -24,8 +38,3 @@ vector:
           .service = .kubernetes.pod_labels.app
           .env = "minikube"
           .message = redact(string!(.message), filters: [r'[\w.+-]+@[\w-]+\.[\w.]+'])
-    sinks:               
-      vlogs:
-        request:
-          headers:
-            VL-Stream-Fields: service,kubernetes.container_name
