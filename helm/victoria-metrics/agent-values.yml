@@ -1,0 +1,15 @@
+fullnameOverride: vm-single-victoria-metrics-agent
+
+service:
+  enabled: true
+
+remoteWrite:
+  - url: http://vm-single-victoria-metrics-single-server.monitoring.svc:8428/api/v1/write
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi

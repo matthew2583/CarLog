@@ -11,6 +11,8 @@ class Config(BaseSettings):
     TOKEN_TTL_MIN: int = 60
     AUTH_PORT: int = 8001
     LOG_LEVEL: str = "INFO"
+    BACKEND_METRICS_PORT: int = 8100
+    AUTH_METRICS_PORT: int = 8101
 
 
 config = Config()

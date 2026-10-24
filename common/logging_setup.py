@@ -20,7 +20,9 @@ class JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord):
         data = {
             **getattr(record, "fields", {}),
-            "timestamp": datetime.fromtimestamp(record.created, UTC).isoformat(timespec="milliseconds"),
+            "timestamp": datetime.fromtimestamp(record.created, UTC).isoformat(
+                timespec="milliseconds"
+            ),
             "level": record.levelname.lower(),
             "message": record.getMessage(),
             "service.name": self.service,
@@ -63,11 +65,13 @@ def add_request_logging(app: FastAPI):
             log.log(
                 logging.ERROR if status >= 500 else logging.INFO,
                 "HTTP-запрос завершён",
-                extra={"fields": {
-                    "request.method": request.method,
-                    "url.path": route.path if route else request.url.path,
-                    "http.response.status_code": status,
-                    "duration_ms": round((time.perf_counter() - started) * 1000, 2),
-                }},
+                extra={
+                    "fields": {
+                        "request.method": request.method,
+                        "url.path": route.path if route else request.url.path,
+                        "http.response.status_code": status,
+                        "duration_ms": round((time.perf_counter() - started) * 1000, 2),
+                    }
+                },
             )
             trace_id_context.reset(token)

@@ -3,6 +3,7 @@ import logging
 from fastapi import APIRouter, Depends
 
 from backend.auth import current_user_id
+from backend.metrics import CARS_CREATED
 from backend.models import Car
 from backend.services import build_car_stats, check_mileage, own_car
 from common.db import found, sql
@@ -30,6 +31,7 @@ def create_car(car: Car, user_id: int = Depends(current_user_id)):
         "VALUES (%s, %s, %s, %s, %s) RETURNING *",
         (car.brand, car.model, car.year, car.mileage, user_id),
     )
+    CARS_CREATED.inc()
     log.info(
         "Автомобиль создан",
         extra={"fields": {"car.id": created["id"], "user.id": user_id}},

@@ -30,10 +30,14 @@ spec:
     metadata:
       labels:
         app: backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8100"
+        prometheus.io/path: "/metrics"
     spec:
       containers:
         - name: backend
-          image: carlog-backend:1.0
+          image: carlog-backend:1.1
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
@@ -42,6 +46,8 @@ spec:
                 name: carlog-secrets
           ports:
             - containerPort: 8000
+            - name: metrics
+              containerPort: 8100
           readinessProbe:
             tcpSocket:
               port: 8000

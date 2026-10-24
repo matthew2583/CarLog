@@ -4,6 +4,7 @@ from datetime import date
 from fastapi import APIRouter, Depends, HTTPException
 
 from backend.auth import current_user_id
+from backend.metrics import RECORDS_COST, RECORDS_CREATED
 from backend.models import KINDS, Record
 from backend.services import check_record_date, own_car
 from common.db import found, sql
@@ -68,6 +69,8 @@ def create_record(record: Record, user_id: int = Depends(current_user_id)):
         "VALUES (%s, %s, %s, %s, %s) RETURNING *",
         (record.car_id, record.date, record.kind, record.cost, record.note),
     )
+    RECORDS_CREATED.labels(record.kind).inc()
+    RECORDS_COST.labels(record.kind).inc(float(record.cost))
     log.info(
         "Запись обслуживания создана",
         extra={"fields": {"record.id": created["id"], "record.kind": record.kind}},

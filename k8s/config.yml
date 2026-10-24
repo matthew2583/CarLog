@@ -10,6 +10,8 @@ data:
   GATEWAY_CONTAINER_PORT: "80"
   LOG_LEVEL: "INFO"
   TOKEN_TTL_MIN: "60"
+  BACKEND_METRICS_PORT: "8100"
+  AUTH_METRICS_PORT: "8101"
 ---
 apiVersion: v1
 kind: Secret

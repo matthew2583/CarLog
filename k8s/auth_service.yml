@@ -30,10 +30,14 @@ spec:
     metadata:
       labels:
         app: auth-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8101"
+        prometheus.io/path: "/metrics"
     spec:
       containers:
         - name: auth-service
-          image: carlog-auth:1.0
+          image: carlog-auth:1.1
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
@@ -42,6 +46,8 @@ spec:
                 name: carlog-secrets
           ports:
             - containerPort: 8001
+            - name: metrics
+              containerPort: 8101
           readinessProbe:
             tcpSocket:
               port: 8001

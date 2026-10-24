@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from fastapi import HTTPException
 
+from backend.metrics import REJECTED
 from backend.models import Record
 from common.db import found, sql
 
@@ -22,6 +23,7 @@ def check_mileage(car: dict, new_mileage: int):
             "Уменьшение пробега отклонено",
             extra={"fields": {"car.id": car["id"]}},
         )
+        REJECTED.labels("mileage_decrease").inc()
         raise HTTPException(
             409, f"Пробег не может быть меньше текущего ({car['mileage']})"
         )
@@ -33,6 +35,7 @@ def check_record_date(record: Record, car: dict):
             "Дата записи отклонена",
             extra={"fields": {"car.id": car["id"], "car.year": car["year"]}},
         )
+        REJECTED.labels("date_before_car_year").inc()
         raise HTTPException(
             422, f"Дата записи раньше года выпуска автомобиля ({car['year']})"
         )
