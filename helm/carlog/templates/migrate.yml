@@ -2,7 +2,10 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: migrate
-  namespace: carlog
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   backoffLimit: 4
   activeDeadlineSeconds: 180
@@ -11,7 +14,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: migrate
-          image: carlog-backend:1.0
+          image: {{ .Values.backendImage }}
           imagePullPolicy: IfNotPresent
           command: ["alembic", "upgrade", "head"]
           envFrom:

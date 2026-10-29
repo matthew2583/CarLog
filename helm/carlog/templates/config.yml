@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: carlog-config
+  namespace: {{ .Release.Namespace }}
+data:
+  BACKEND_PORT: "8000"
+  AUTH_PORT: "8001"
+  FRONTEND_PORT: "80"
+  GATEWAY_CONTAINER_PORT: "80"
+  LOG_LEVEL: "INFO"
+  TOKEN_TTL_MIN: "60"
+  BACKEND_METRICS_PORT: "8100"
+  AUTH_METRICS_PORT: "8101"
+  GET_METHOD_FAIL_RATE: {{ .Values.getMethodFailRate | quote }}
+  GET_METHOD_FAST_RATE: {{ .Values.getMethodFastRate | quote }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: carlog-secrets
+  namespace: {{ .Release.Namespace }}
+stringData:
+  POSTGRES_USER: carlog
+  POSTGRES_DB: carlog
+  POSTGRES_PASSWORD: {{ .Values.postgresPassword | quote }}
+  DATABASE_URL: {{ printf "postgresql://carlog:%s@db:5432/carlog" .Values.postgresPassword | quote }}
+  JWT_SECRET: {{ .Values.jwtSecret | quote }}

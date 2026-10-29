@@ -1,21 +1,21 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend
-  namespace: carlog
+  name: auth-service
+  namespace: {{ .Release.Namespace }}
 spec:
   type: ClusterIP
   selector:
-    app: frontend
+    app: auth-service
   ports:
-    - port: 80
-      targetPort: 80
+    - port: 8001
+      targetPort: 8001
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend
-  namespace: carlog
+  name: auth-service
+  namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
   strategy:
@@ -25,29 +25,37 @@ spec:
       maxUnavailable: 1
   selector:
     matchLabels:
-      app: frontend
+      app: auth-service
   template:
     metadata:
       labels:
-        app: frontend
+        app: auth-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8101"
+        prometheus.io/path: "/metrics"
     spec:
       containers:
-        - name: frontend
-          image: carlog-frontend:1.0
+        - name: auth-service
+          image: {{ .Values.authImage }}
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
                 name: carlog-config
+            - secretRef:
+                name: carlog-secrets
           ports:
-            - containerPort: 80
+            - containerPort: 8001
+            - name: metrics
+              containerPort: 8101
           readinessProbe:
             tcpSocket:
-              port: 80
+              port: 8001
             initialDelaySeconds: 3
             periodSeconds: 5
           livenessProbe:
             tcpSocket:
-              port: 80
+              port: 8001
             initialDelaySeconds: 10
             periodSeconds: 10
           resources:

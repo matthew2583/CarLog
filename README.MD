@@ -20,46 +20,40 @@ CarLog - приложение для учёта расходов на автом
 
 ## Запуск приложения в Minikube
 
-Запустите кластер и соберите образы прямо в Minikube, чтобы Kubernetes смог их найти без Docker registry:
+### Установка в Minikube
+
+Манифесты приложения оформлены как Helm-чарт и находятся в [helm/carlog](helm/carlog).
+Сначала запустите Minikube и соберите локальные образы:
 
 ```sh
 minikube start
-minikube image build -t carlog-backend:1.1 -f backend/Dockerfile .
+minikube image build -t carlog-backend:1.2 -f backend/Dockerfile .
 minikube image build -t carlog-auth:1.1 -f auth_service/Dockerfile .
 minikube image build -t carlog-frontend:1.0 -f frontend/Dockerfile frontend
+minikube image build -t carlog-prober:1.1 -f prober/Dockerfile prober
 ```
 
-Создайте namespace и конфигурацию, затем запустите базу данных и дождитесь её готовности:
+Установите чарт:
 
 ```sh
-kubectl apply -f k8s/namespace.yml
-kubectl apply -f k8s/config.yml
-kubectl apply -f k8s/postgres.yml
-kubectl rollout status statefulset/db -n carlog --timeout=120s
+helm upgrade --install carlog ./helm/carlog \
+  --namespace carlog \
+  --create-namespace
 ```
 
-Под `db` теперь состоит из двух контейнеров: Postgres и postgres-exporter.
-
-Примените миграции и дождитесь их завершения:
+После установки дождитесь запуска подов:
 
 ```sh
-kubectl apply -f k8s/migrate.yml
-kubectl wait --for=condition=complete job/migrate -n carlog --timeout=180s
+kubectl get pods -n carlog
 ```
 
-Запустите сервисы приложения:
-
-```sh
-kubectl apply -f k8s/backend.yml -f k8s/auth_service.yml -f k8s/frontend.yml -f k8s/gateway.yml
-```
-
-Откройте приложение через gateway:
+Откройте приложение:
 
 ```sh
 kubectl port-forward -n carlog svc/gateway 8080:80
 ```
 
-После запуска откройте `http://localhost:8080`. Оставьте команду port-forward работающей, пока пользуетесь приложением.
+Откройте в браузере `http://localhost:8080`. Миграция базы данных запускается Helm автоматически.
 
 ## Логи в VictoriaLogs
 

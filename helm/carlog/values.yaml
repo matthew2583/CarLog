@@ -1,0 +1,8 @@
+backendImage: carlog-backend:1.2
+authImage: carlog-auth:1.1
+frontendImage: carlog-frontend:1.0
+proberImage: carlog-prober:1.1
+postgresPassword: carlog123
+jwtSecret: secret
+getMethodFailRate: "0.0"
+getMethodFastRate: "1.0"
