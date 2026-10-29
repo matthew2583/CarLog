@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prober
+  namespace: carlog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prober
+  template:
+    metadata:
+      labels:
+        app: prober
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8102"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: prober
+          image: carlog-prober:1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TARGET
+              value: http://gateway
+          ports:
+            - name: metrics
+              containerPort: 8102
+          readinessProbe:
+            tcpSocket:
+              port: 8102
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 8102
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 10m
+            limits:
+              memory: 128Mi
+              cpu: 100m

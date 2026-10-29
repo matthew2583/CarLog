@@ -13,6 +13,8 @@ class Config(BaseSettings):
     LOG_LEVEL: str = "INFO"
     BACKEND_METRICS_PORT: int = 8100
     AUTH_METRICS_PORT: int = 8101
+    GET_METHOD_FAIL_RATE: float = 0.0   # вероятность ответа 500
+    GET_METHOD_FAST_RATE: float = 1.0   # вероятность быстрого ответа (иначе медленный)
 
 
 config = Config()

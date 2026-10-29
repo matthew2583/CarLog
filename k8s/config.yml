@@ -12,6 +12,8 @@ data:
   TOKEN_TTL_MIN: "60"
   BACKEND_METRICS_PORT: "8100"
   AUTH_METRICS_PORT: "8101"
+  GET_METHOD_FAIL_RATE: "0.0"
+  GET_METHOD_FAST_RATE: "1.0"
 ---
 apiVersion: v1
 kind: Secret
