@@ -1,0 +1,30 @@
+server:
+  fullnameOverride: vm-single-vmalert
+  datasource:
+    url: http://vm-single-victoria-metrics-single-server.monitoring.svc:8428
+  notifier:
+    url: http://vm-single-alertmanager.monitoring.svc:9093
+  configMap: carlog-alerts
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+alertmanager:
+  enabled: true
+  fullnameOverride: vm-single-alertmanager
+  configSecret: carlog-alertmanager
+  retention: 120h
+  persistentVolume:
+    enabled: true
+    size: 1Gi
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi

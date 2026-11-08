@@ -1,0 +1,51 @@
+groups:
+  - name: carlog-service
+    interval: 30s
+    rules:
+      - alert: CarLogProbeFailed
+        expr: carlog_probe_success{probe="get_method"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "CarLog недоступен"
+          description: "Проба /api/get_method завершается ошибкой не менее 2 минут"
+
+      - alert: CarLogSlowResponses
+        expr: avg_over_time(carlog_probe_duration_seconds{probe="get_method"}[5m]) > 1
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CarLog отвечает медленно"
+          description: "Среднее время ответа /api/get_method за 5 минут выше 1 секунды"
+
+      - alert: CarLogRejectedOperations
+        expr: sum(rate(carlog_rejected_total[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "B CarLog много отклонённых операций"
+          description: "Сервис отклоняет больше одной операции в секунду"
+
+  - name: carlog-runtime
+    interval: 30s
+    rules:
+      - alert: CarLogMemoryHigh
+        expr: process_resident_memory_bytes > 200 * 1024 * 1024
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Python-процесс CarLog использует много памяти"
+          description: "Процесс {{ $labels.instance }} использует больше 200 MiB памяти"
+
+      - alert: CarLogCpuHigh
+        expr: rate(process_cpu_seconds_total[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Python-процесс CarLog загрузил CPU"
+          description: "Процесс {{ $labels.instance }} использует более 80% одного CPU"

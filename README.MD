@@ -110,6 +110,40 @@ kubectl port-forward svc/vm-single-victoria-metrics-single-server -n monitoring 
 kubectl port-forward svc/vm-single-victoria-metrics-agent -n monitoring 8429:8429
 ```
 
+### Алерты
+
+Правила алертов находятся в [monitoring/alerts.yml](monitoring/alerts.yml), Secret
+с настройками Alertmanager - в [monitoring/alertmanager-secret.yml](monitoring/alertmanager-secret.yml),
+а учебный SMTP-сервис MailHog - в [monitoring/mailhog.yml](monitoring/mailhog.yml).
+
+Создайте ConfigMap и установите vmalert вместе с Alertmanager:
+
+```sh
+kubectl -n monitoring create configmap carlog-alerts \
+  --from-file=alert-rules.yaml=monitoring/alerts.yml
+kubectl apply -f monitoring/mailhog.yml
+kubectl apply -f monitoring/alertmanager-secret.yml
+helm upgrade --install vm-single vm/victoria-metrics-alert \
+  --namespace monitoring \
+  -f helm/victoria-metrics/vmalert-values.yml
+```
+
+Откройте интерфейс MailHog:
+
+```sh
+kubectl port-forward -n monitoring svc/mailhog 8025:8025
+```
+
+После этого письма доступны по адресу `http://localhost:8025`.
+
+Для проверки можно временно установить `getMethodFailRate=1` при обновлении
+чарта, дождаться письма `CarLogProbeFailed`, а затем вернуть значение `0`:
+
+```sh
+helm upgrade carlog ./helm/carlog --namespace carlog --set getMethodFailRate=1
+helm upgrade carlog ./helm/carlog --namespace carlog --set getMethodFailRate=0
+```
+
 ### Какие метрики есть
 
 Метрики рантайма и фреймворка отдают `prometheus-client` и `prometheus-fastapi-instrumentator`: память и CPU процесса, сборщик мусора Python, число и длительность HTTP-запросов. Метрики Postgres начинаются с `pg_`.
