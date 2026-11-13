@@ -29,8 +29,8 @@ CarLog - приложение для учёта расходов на автом
 minikube start
 minikube image build -t carlog-backend:1.2 -f backend/Dockerfile .
 minikube image build -t carlog-auth:1.1 -f auth_service/Dockerfile .
-minikube image build -t carlog-frontend:1.0 -f frontend/Dockerfile frontend
-minikube image build -t carlog-prober:1.1 -f prober/Dockerfile prober
+minikube image build -t carlog-frontend:1.0 -f frontend/Dockerfile .
+minikube image build -t carlog-prober:1.1 -f prober/Dockerfile .
 ```
 
 Установите чарт:
@@ -94,17 +94,17 @@ kubectl get pods -n monitoring
 Если приложение уже запущено, после `kubectl apply` обновлённых манифестов перезапустите поды, чтобы подтянулись аннотации и новые образы:
 
 ```sh
-kubectl rollout restart deployment/backend deployment/auth-service -n carlog
+kubectl rollout restart deployment/backend deployment/auth-service deployment/prober -n carlog
 kubectl delete pod db-0 -n carlog
 ```
 
-Чтобы посмотреть метрики нужно пробросьте порт хранилища и откройте `http://localhost:8428/vmui`:
+Чтобы посмотреть метрики, пробросьте порт хранилища и откройте `http://localhost:8428/vmui`:
 
 ```sh
 kubectl port-forward svc/vm-single-victoria-metrics-single-server -n monitoring 8428:8428
 ```
 
-Чтобы проверить, что vmagent видит все таргеты нужно пробросить порт агента и откройть `http://localhost:8429/targets`. В `kubernetes-pods` должны быть три пода `carlog`: backend, auth-service и db-0.
+Чтобы проверить, что vmagent видит все таргеты, пробросьте порт агента и откройте `http://localhost:8429/targets`. В `kubernetes-pods` должны быть четыре пода `carlog`: backend, auth-service, prober и db-0.
 
 ```sh
 kubectl port-forward svc/vm-single-victoria-metrics-agent -n monitoring 8429:8429
@@ -120,10 +120,11 @@ kubectl port-forward svc/vm-single-victoria-metrics-agent -n monitoring 8429:842
 
 ```sh
 kubectl -n monitoring create configmap carlog-alerts \
-  --from-file=alert-rules.yaml=monitoring/alerts.yml
+  --from-file=alert-rules.yaml=monitoring/alerts.yml \
+  --dry-run=client -o yaml | kubectl apply -f -
 kubectl apply -f monitoring/mailhog.yml
 kubectl apply -f monitoring/alertmanager-secret.yml
-helm upgrade --install vm-single vm/victoria-metrics-alert \
+helm upgrade --install vm-alert vm/victoria-metrics-alert \
   --namespace monitoring \
   -f helm/victoria-metrics/vmalert-values.yml
 ```
@@ -136,13 +137,43 @@ kubectl port-forward -n monitoring svc/mailhog 8025:8025
 
 После этого письма доступны по адресу `http://localhost:8025`.
 
-Для проверки можно временно установить `getMethodFailRate=1` при обновлении
-чарта, дождаться письма `CarLogProbeFailed`, а затем вернуть значение `0`:
+Для проверки можно использовать такие примеры:
+
+1. Включить 30% 500-ошибок на get_method:
 
 ```sh
-helm upgrade carlog ./helm/carlog --namespace carlog --set getMethodFailRate=1
-helm upgrade carlog ./helm/carlog --namespace carlog --set getMethodFailRate=0
+helm upgrade carlog ./helm/carlog --namespace carlog --set getMethodFailRate=0.3
 ```
+
+2. Вернуть в норму:
+
+```sh
+helm upgrade carlog ./helm/carlog --namespace carlog --set getMethodFailRate=0 --set getMethodFastRate=1
+```
+
+## Grafana
+
+Grafana разворачивается в namespace `monitoring` из официального Helm-чарта.
+Установите чарт:
+
+```sh
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+helm upgrade --install grafana grafana/grafana \
+  --namespace monitoring \
+  -f helm/grafana/values.yml
+```
+
+Для доступа к интерфейсу используйте port-forward:
+
+```sh
+kubectl port-forward -n monitoring svc/grafana 3000:80
+```
+
+Логин: `admin`, пароль: `admin`.
+
+Дашборд с метриками CarLog находится в [grafana-dashboard.json](grafana-dashboard.json) - импортируйте его через меню **Dashboards -> Import**.
+
 
 ### Какие метрики есть
 
@@ -157,7 +188,7 @@ helm upgrade carlog ./helm/carlog --namespace carlog --set getMethodFailRate=0
 | `carlog_cars_created_total` | созданные автомобили |
 | `carlog_records_created_total{kind}` | созданные записи по типам: ТО, ремонт, заправка и так далее |
 | `carlog_records_cost_total{kind}` | сумма расходов в созданных записях по типам |
-| `carlog_operations_rejected_total{reason}` | отклонённые операции: `mileage_decrease` (пробег уменьшили) и `date_before_car_year` (дата раньше года выпуска) |
+| `carlog_rejected_total{reason}` | отклонённые операции: `mileage_decrease` (пробег уменьшили) и `date_before_car_year` (дата раньше года выпуска) |
 
 ## Основные сущности
 
