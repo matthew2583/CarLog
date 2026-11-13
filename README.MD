@@ -29,8 +29,8 @@ CarLog - приложение для учёта расходов на автом
 minikube start
 minikube image build -t carlog-backend:1.2 -f backend/Dockerfile .
 minikube image build -t carlog-auth:1.1 -f auth_service/Dockerfile .
-minikube image build -t carlog-frontend:1.0 -f frontend/Dockerfile .
-minikube image build -t carlog-prober:1.1 -f prober/Dockerfile .
+minikube image build -t carlog-frontend:1.0 frontend/
+minikube image build -t carlog-prober:1.1 prober/
 ```
 
 Установите чарт:
