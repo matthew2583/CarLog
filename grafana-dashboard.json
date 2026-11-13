@@ -342,7 +342,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(sum(increase(http_requests_total{handler=~\".*get_method\",status!~\"5..|5xx\"}[10m])) / clamp_min(sum(increase(http_requests_total{handler=~\".*get_method\"}[10m])), 1)) >= bool 0.95 and (avg_over_time(carlog_probe_duration_seconds{probe=\"get_method\"}[1m]) <= bool 1.5) and (avg_over_time((min(min_over_time(pg_up[1m])) * min(min_over_time(carlog_probe_success{probe=\"get_method\"}[1m])))[10m:1m]) >= bool 0.80)"
+          "expr": "((sum(increase(http_requests_total{handler=~\".*get_method\",status!~\"5..|5xx\"}[10m])) / clamp_min(sum(increase(http_requests_total{handler=~\".*get_method\"}[10m])), 1)) >= bool 0.95) * on() ((max(avg_over_time(carlog_probe_duration_seconds{probe=\"get_method\"}[1m]))) <= bool 1.5) * on() ((avg_over_time((min(min_over_time(pg_up[1m])) * min(min_over_time(carlog_probe_success{probe=\"get_method\"}[1m])))[10m:1m])) >= bool 0.80)"
         }
       ],
       "fieldConfig": {
@@ -467,7 +467,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(sum(increase(http_requests_total{handler=~\".*get_method\",status!~\"5..|5xx\"}[10m])) / clamp_min(sum(increase(http_requests_total{handler=~\".*get_method\"}[10m])), 1)) >= bool 0.95 and (avg_over_time(carlog_probe_duration_seconds{probe=\"get_method\"}[1m]) <= bool 1.5) and (avg_over_time((min(min_over_time(pg_up[1m])) * min(min_over_time(carlog_probe_success{probe=\"get_method\"}[1m])))[10m:1m]) >= bool 0.80)",
+          "expr": "((sum(increase(http_requests_total{handler=~\".*get_method\",status!~\"5..|5xx\"}[10m])) / clamp_min(sum(increase(http_requests_total{handler=~\".*get_method\"}[10m])), 1)) >= bool 0.95) * on() ((max(avg_over_time(carlog_probe_duration_seconds{probe=\"get_method\"}[1m]))) <= bool 1.5) * on() ((avg_over_time((min(min_over_time(pg_up[1m])) * min(min_over_time(carlog_probe_success{probe=\"get_method\"}[1m])))[10m:1m])) >= bool 0.80)",
           "legendFormat": "overall"
         },
         {
