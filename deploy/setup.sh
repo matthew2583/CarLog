@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 # Поднимает окружение для стратегий деплоя CarLog на локальном minikube:
 #   1. minikube (docker-драйвер)
 #   2. Envoy Gateway + Gateway API CRD
