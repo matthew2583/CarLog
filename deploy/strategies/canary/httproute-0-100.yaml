@@ -1,0 +1,28 @@
+# CANARY — шаг 3 (финал): 100% на v2. После этого старую v1 можно масштабировать
+# в 0 или удалить. Откат на любом шаге — вернуть веса назад (90/10 или 100/0).
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: backend
+  namespace: carlog
+spec:
+  parentRefs:
+    - name: eg
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: backend
+          port: 8000
+          weight: 0
+        - name: backend-v2
+          port: 8000
+          weight: 100

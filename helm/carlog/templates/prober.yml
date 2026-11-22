@@ -23,7 +23,7 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: TARGET
-              value: http://gateway
+              value: {{ required "proberTarget: задайте адрес Envoy-прокси (см. deploy/setup.sh)" .Values.proberTarget | quote }}
           ports:
             - name: metrics
               containerPort: 8102
@@ -43,4 +43,4 @@ spec:
               cpu: 10m
             limits:
               memory: 128Mi
-              cpu: 100m
+              cpu: 100m

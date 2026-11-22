@@ -5,8 +5,10 @@ from fastapi import APIRouter, FastAPI, HTTPException
 from auth_service.auth import create_token, hash_password, verify_password
 from auth_service.metrics import LOGINS, REGISTRATIONS
 from auth_service.models import Credentials
+from common import health
 from common.config import config
 from common.db import sql
+from common.health import setup_version
 from common.logging_setup import add_request_logging, setup_logging
 from common.metrics import setup_metrics
 
@@ -49,6 +51,8 @@ def login(data: Credentials):
 
 app = FastAPI(title="CarLog Auth", root_path="/api/auth")
 add_request_logging(app)
+setup_version(app, "auth-service")
 setup_metrics(app, config.AUTH_METRICS_PORT)
+app.include_router(health.router)
 app.include_router(router)
 log.info("Сервис авторизации запущен")

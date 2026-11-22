@@ -8,7 +8,7 @@ CarLog - приложение для учёта расходов на автом
 | Бэкенд (API) | Python 3.14, FastAPI, Uvicorn |
 | Сервис авторизации | Python, FastAPI, PyJWT, PBKDF2-HMAC-SHA256 |
 | Фронтенд | HTML + CSS + JS, раздаётся простым HTTP-сервером Python |
-| Шлюз | nginx  |
+| Шлюз | Envoy Gateway (Gateway API); nginx - в docker-compose |
 | БД | PostgreSQL 16 |
 | Доступ к БД | psycopg |
 | Миграции | Alembic |
@@ -22,38 +22,33 @@ CarLog - приложение для учёта расходов на автом
 
 ### Установка в Minikube
 
-Манифесты приложения оформлены как Helm-чарт и находятся в [helm/carlog](helm/carlog).
-Сначала запустите Minikube и соберите локальные образы:
+Приложение работает в нескольких репликах (backend - 4, auth-service и frontend - 2) за Envoy Gateway (Gateway API). Манифесты приложения - Helm-чарт [helm/carlog](helm/carlog), Gateway и маршруты - в [deploy](deploy). Одной командой из корня проекта (нужны `minikube`, `kubectl`, `helm`, Docker):
 
 ```sh
-minikube start
-minikube image build -t carlog-backend:1.2 -f backend/Dockerfile .
-minikube image build -t carlog-auth:1.1 -f auth_service/Dockerfile .
-minikube image build -t carlog-frontend:1.0 frontend/
-minikube image build -t carlog-prober:1.1 prober/
+./deploy/setup.sh
 ```
 
-Установите чарт:
-
-```sh
-helm upgrade --install carlog ./helm/carlog \
-  --namespace carlog \
-  --create-namespace
-```
-
-После установки дождитесь запуска подов:
+Скрипт запускает Minikube, ставит Envoy Gateway и kube-prometheus-stack (Prometheus и Grafana для дашборда стратегий), собирает образы, применяет Gateway, маршруты и чарт. После установки проверьте поды:
 
 ```sh
 kubectl get pods -n carlog
 ```
 
-Откройте приложение:
+Откройте приложение: `./deploy/traffic.sh` пробрасывает порт Envoy на `localhost:8888` и шлёт запросы, а пока он работает, сайт доступен по `http://localhost:8888`. Миграция базы данных запускается Helm автоматически.
+
+### Что сделано для нескольких реплик
+
+- **Состояние вне пода.** Данные - в PostgreSQL (StatefulSet `db` с PVC), токены JWT проверяются по общему секрету из Secret, поэтому любой под обработает любой запрос.
+- **Пробы.** Backend и auth-service отдают `/health` (liveness) и `/ready` (readiness, проверяет доступность БД), frontend проверяется по `/`. Пробы не пишутся в логи.
+- **Версия.** Переменная `APP_VERSION` (в чарте - `backendVersion`, `authVersion`): она возвращается заголовком `X-App-Version` (и именем пода в `X-Pod`) в каждом ответе, эндпоинтом `GET /api/version`, метрикой `carlog_app_info{service,version}` и полем `app.version` в JSON-логах.
 
 ```sh
-kubectl port-forward -n carlog svc/gateway 8080:80
+curl -s localhost:8888/api/version   # {"version":"v1.0.0","pod":"backend-..."}
 ```
 
-Откройте в браузере `http://localhost:8080`. Миграция базы данных запускается Helm автоматически.
+## Стратегии деплоя
+
+Пошаговые сценарии Rolling, Blue/Green, Canary, A/B и Shadow (команды, откат, запись логов) описаны в [deploy/README.md](deploy/README.md). Манифесты - в [deploy](deploy): Gateway и постоянные маршруты, вторая версия `backend-v2` и HTTPRoute каждой стратегии. Одна стратегия за раз: между ними выполняйте `./deploy/reset.sh`. Логи стратегий сохраняйте в `deploy/logs`.
 
 ## Логи в VictoriaLogs
 
@@ -104,7 +99,7 @@ kubectl delete pod db-0 -n carlog
 kubectl port-forward svc/vm-single-victoria-metrics-single-server -n monitoring 8428:8428
 ```
 
-Чтобы проверить, что vmagent видит все таргеты, пробросьте порт агента и откройте `http://localhost:8429/targets`. В `kubernetes-pods` должны быть четыре пода `carlog`: backend, auth-service, prober и db-0.
+Чтобы проверить, что vmagent видит все таргеты, пробросьте порт агента и откройте `http://localhost:8429/targets`. В `kubernetes-pods` должны быть поды `carlog`: все реплики backend и auth-service, prober и db-0.
 
 ```sh
 kubectl port-forward svc/vm-single-victoria-metrics-agent -n monitoring 8429:8429
@@ -142,13 +137,13 @@ kubectl port-forward -n monitoring svc/mailhog 8025:8025
 1. Включить 30% 500-ошибок на get_method:
 
 ```sh
-helm upgrade carlog ./helm/carlog --namespace carlog --set getMethodFailRate=0.3
+helm upgrade carlog ./helm/carlog --namespace carlog --reuse-values --set getMethodFailRate=0.3
 ```
 
 2. Вернуть в норму:
 
 ```sh
-helm upgrade carlog ./helm/carlog --namespace carlog --set getMethodFailRate=0 --set getMethodFastRate=1
+helm upgrade carlog ./helm/carlog --namespace carlog --reuse-values --set getMethodFailRate=0 --set getMethodFastRate=1
 ```
 
 ## Grafana

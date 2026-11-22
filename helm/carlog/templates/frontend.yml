@@ -17,12 +17,12 @@ metadata:
   name: frontend
   namespace: {{ .Release.Namespace }}
 spec:
-  replicas: 1
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: frontend
@@ -41,12 +41,14 @@ spec:
           ports:
             - containerPort: 80
           readinessProbe:
-            tcpSocket:
+            httpGet:
+              path: /
               port: 80
             initialDelaySeconds: 3
             periodSeconds: 5
           livenessProbe:
-            tcpSocket:
+            httpGet:
+              path: /
               port: 80
             initialDelaySeconds: 10
             periodSeconds: 10

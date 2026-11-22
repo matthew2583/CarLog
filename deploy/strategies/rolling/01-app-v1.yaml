@@ -1,0 +1,9 @@
+# ROLLING UPDATE — шаг 1: стартовая версия.
+# Один Deployment `backend` (helm/carlog), Kubernetes сам постепенно заменяет поды при обновлении.
+# Gateway API здесь не дробит трафик — HTTPRoute `backend` просто всегда смотрит на сервис
+# `backend`, а состав pod'ов за ним меняет контроллер Deployment.
+#
+# Применение (values-файл для Helm вместо kubectl apply, т.к. backend живёт в чарте):
+#   helm upgrade carlog ./helm/carlog -n carlog --reuse-values -f deploy/strategies/rolling/01-app-v1.yaml
+backendVersion: v1.0.0
+backendReadyDelay: 3

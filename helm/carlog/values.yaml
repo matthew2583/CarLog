@@ -1,8 +1,14 @@
-backendImage: carlog-backend:1.2
-authImage: carlog-auth:1.1
+backendImage: carlog-backend:1.3
+authImage: carlog-auth:1.2
 frontendImage: carlog-frontend:1.0
 proberImage: carlog-prober:1.1
 postgresPassword: carlog123
 jwtSecret: secret
 getMethodFailRate: "0.0"
 getMethodFastRate: "1.0"
+backendReplicas: 4
+backendVersion: v1.0.0
+backendReadyDelay: 3
+authVersion: v1.0.0
+# адрес Envoy-прокси внутри кластера, его подставляет deploy/setup.sh
+proberTarget: ""

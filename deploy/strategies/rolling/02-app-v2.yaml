@@ -1,0 +1,11 @@
+# ROLLING UPDATE — шаг 2: накатываем версию 2.
+# Меняем ТОЛЬКО версию (APP_VERSION и метку пода version) у того же Deployment `backend`
+# и применяем файл. Kubernetes запускает rolling update: поднимает новый под (maxSurge=1),
+# ждёт его Ready, гасит один старый — и так, пока все 4 пода не станут v2.0.0.
+# Сервис и HTTPRoute не трогаем — трафик как шёл на `backend`, так и идёт.
+#
+#   helm upgrade carlog ./helm/carlog -n carlog --reuse-values -f deploy/strategies/rolling/02-app-v2.yaml
+backendVersion: v2.0.0
+# Небольшая задержка готовности — чтобы смену версий было видно
+# в `kubectl get pods -w` и на графике, а не мгновенно.
+backendReadyDelay: 10

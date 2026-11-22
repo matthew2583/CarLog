@@ -3,13 +3,20 @@ kind: Service
 metadata:
   name: backend
   namespace: {{ .Release.Namespace }}
+  labels:
+    app: backend
+    version: {{ .Values.backendVersion }}
 spec:
   type: ClusterIP
   selector:
     app: backend
   ports:
-    - port: 8000
+    - name: http
+      port: 8000
       targetPort: 8000
+    - name: metrics
+      port: 8100
+      targetPort: 8100
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -17,12 +24,13 @@ metadata:
   name: backend
   namespace: {{ .Release.Namespace }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.backendReplicas }}
+  minReadySeconds: 5
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: backend
@@ -30,6 +38,7 @@ spec:
     metadata:
       labels:
         app: backend
+        version: {{ .Values.backendVersion }}
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "8100"
@@ -44,17 +53,22 @@ spec:
                 name: carlog-config
             - secretRef:
                 name: carlog-secrets
+          env:
+            - name: APP_VERSION
+              value: {{ .Values.backendVersion | quote }}
           ports:
             - containerPort: 8000
             - name: metrics
               containerPort: 8100
           readinessProbe:
-            tcpSocket:
+            httpGet:
+              path: /ready
               port: 8000
-            initialDelaySeconds: 3
+            initialDelaySeconds: {{ .Values.backendReadyDelay }}
             periodSeconds: 5
           livenessProbe:
-            tcpSocket:
+            httpGet:
+              path: /health
               port: 8000
             initialDelaySeconds: 10
             periodSeconds: 10
@@ -64,4 +78,4 @@ spec:
               cpu: 50m
             limits:
               memory: 256Mi
-              cpu: 500m
+              cpu: 500m

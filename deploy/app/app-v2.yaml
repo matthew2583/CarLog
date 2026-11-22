@@ -1,0 +1,91 @@
+# Версия 2 приложения backend (в стратегиях blue/green — «blue», в canary — «new»).
+# Версия 1 (green / stable) — Deployment+Service `backend` из Helm-чарта (helm/carlog).
+# Отличается от v1 только значением APP_VERSION — этого достаточно, чтобы видеть
+# распределение трафика по версиям в curl и на дашборде Grafana.
+#   :8000 — HTTP API (GET /api/version -> {"version": ..., "pod": ...})
+#   :8000 — пробы /health (liveness) и /ready (readiness, проверяет БД)
+#   :8100 — метрики Prometheus (/metrics)
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-v2
+  namespace: carlog
+  labels:
+    app: backend
+    version: v2.0.0
+spec:
+  selector:
+    app: backend-v2
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+    - name: metrics
+      port: 8100
+      targetPort: metrics
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-v2
+  namespace: carlog
+  labels:
+    app: backend
+    version: v2.0.0
+spec:
+  replicas: 4
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: backend-v2
+  template:
+    metadata:
+      labels:
+        app: backend-v2
+        version: v2.0.0
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8100"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: backend
+          image: carlog-backend:1.3
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: carlog-config
+            - secretRef:
+                name: carlog-secrets
+          env:
+            - name: APP_VERSION
+              value: v2.0.0
+          ports:
+            - name: http
+              containerPort: 8000
+            - name: metrics
+              containerPort: 8100
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

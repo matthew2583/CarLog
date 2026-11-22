@@ -3,7 +3,9 @@ import logging
 from fastapi import FastAPI
 
 from backend.routers import cars, demo, records
+from common import health
 from common.config import config
+from common.health import setup_version
 from common.logging_setup import add_request_logging, setup_logging
 from common.metrics import setup_metrics
 
@@ -12,8 +14,10 @@ log = logging.getLogger("carlog")
 
 app = FastAPI(title="CarLog", root_path="/api")
 add_request_logging(app)
+setup_version(app, "backend")
 setup_metrics(app, config.BACKEND_METRICS_PORT)
 
+app.include_router(health.router)
 app.include_router(cars.router)
 app.include_router(records.router)
 app.include_router(demo.router)

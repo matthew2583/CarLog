@@ -9,6 +9,8 @@ from uuid import uuid4
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from common.config import config
+
 trace_id_context: ContextVar[str | None] = ContextVar("trace_id", default=None)
 
 
@@ -26,6 +28,7 @@ class JsonFormatter(logging.Formatter):
             "level": record.levelname.lower(),
             "message": record.getMessage(),
             "service.name": self.service,
+            "app.version": config.APP_VERSION,
             "logger_name": record.name,
         }
         if trace_id := trace_id_context.get():
@@ -48,6 +51,8 @@ def add_request_logging(app: FastAPI):
 
     @app.middleware("http")
     async def log_request(request: Request, call_next):
+        if request.url.path in ("/health", "/ready"):  # пробы k8s не пишем в лог
+            return await call_next(request)
         trace_id = str(uuid4())
         token = trace_id_context.set(trace_id)
         started = time.perf_counter()

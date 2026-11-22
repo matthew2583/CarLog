@@ -1,0 +1,32 @@
+# ServiceMonitor для kube-prometheus-stack: Prometheus Operator сам найдёт все
+# сервисы с меткой app=backend в namespace carlog и будет снимать метрики
+# с именованного порта `metrics` (:8100, путь /metrics) каждые 15 секунд.
+# Один ServiceMonitor покрывает backend и backend-v2 — у обоих метка app=backend.
+#
+# ВАЖНО про лейбл version: метрика http_requests_total из prometheus-fastapi-instrumentator не содержит
+# версии приложения. Поэтому берём версию из метки пода version через relabeling. У подов
+# v1 и v2 метки разные (version=v1.0.0 / v2.0.0), так что дашборд
+# sum(rate(http_requests_total[2m])) by (version) корректно разводит версии —
+# в том числе во время rolling update, когда в одном сервисе соседствуют v1 и v2.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: backend
+  namespace: carlog
+  labels:
+    app: backend
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  namespaceSelector:
+    matchNames:
+      - carlog
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+      relabelings:
+        # скопировать метку пода version в метку метрики version
+        - sourceLabels: [__meta_kubernetes_pod_label_version]
+          targetLabel: version

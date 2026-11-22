@@ -11,6 +11,7 @@ class Config(BaseSettings):
     TOKEN_TTL_MIN: int = 60
     AUTH_PORT: int = 8001
     LOG_LEVEL: str = "INFO"
+    APP_VERSION: str = "v1.0.0"
     BACKEND_METRICS_PORT: int = 8100
     AUTH_METRICS_PORT: int = 8101
     GET_METHOD_FAIL_RATE: float = 0.0   # вероятность ответа 500
