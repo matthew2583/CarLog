@@ -1,0 +1,50 @@
+Пробрасываю локальный порт :8888 -> envoy-gateway-system/svc/envoy-carlog-eg-242bd162:80
+Трафик на http://localhost:8888/api/version  (интервал 0.2s). Ctrl-C — остановить.
+-------------------------------------------------------------------
+23:32:58 | {"version":"v1.0.0","pod":"backend-787d4bdc9d-gdz4p"}
+23:32:58 | {"version":"v1.0.0","pod":"backend-787d4bdc9d-gdz4p"}
+23:32:58 | {"version":"v1.0.0","pod":"backend-787d4bdc9d-gdz4p"}
+23:32:58 | {"version":"v1.0.0","pod":"backend-787d4bdc9d-9r84x"}
+23:32:58 | {"version":"v1.0.0","pod":"backend-787d4bdc9d-276ss"}
+23:32:59 | {"version":"v1.0.0","pod":"backend-787d4bdc9d-wz789"}
+23:32:59 | {"version":"v1.0.0","pod":"backend-787d4bdc9d-gdz4p"}
+23:32:59 | {"version":"v1.0.0","pod":"backend-787d4bdc9d-wz789"}
+23:32:59 | {"version":"v1.0.0","pod":"backend-787d4bdc9d-gdz4p"}
+23:33:00 | {"version":"v1.0.0","pod":"backend-787d4bdc9d-9r84x"}
+23:33:00 | {"version":"v1.0.0","pod":"backend-787d4bdc9d-gdz4p"}
+23:33:00 | {"version":"v1.0.0","pod":"backend-787d4bdc9d-gdz4p"}
+23:33:00 | {"version":"v1.0.0","pod":"backend-787d4bdc9d-wz789"}
+23:33:00 | {"version":"v1.0.0","pod":"backend-787d4bdc9d-9r84x"}
+23:33:01 | {"version":"v1.0.0","pod":"backend-787d4bdc9d-wz789"}
+
+Останавливаю port-forward (pid 108719)
+Пробрасываю локальный порт :8888 -> envoy-gateway-system/svc/envoy-carlog-eg-242bd162:80
+Трафик на http://localhost:8888/api/version  (интервал 0.2s). Ctrl-C — остановить.
+-------------------------------------------------------------------
+23:33:01 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-f2vwv"}
+23:33:01 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-f2vwv"}
+23:33:01 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-jpjwf"}
+23:33:02 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-f2vwv"}
+23:33:02 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-jpjwf"}
+23:33:02 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-f2vwv"}
+23:33:02 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-sxw7n"}
+23:33:02 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-sxw7n"}
+23:33:03 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-f2vwv"}
+23:33:03 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-jpjwf"}
+23:33:03 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-f2vwv"}
+23:33:03 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-f2vwv"}
+23:33:04 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-dsgj4"}
+23:33:04 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-sxw7n"}
+23:33:04 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-jpjwf"}
+23:33:04 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-sxw7n"}
+23:33:04 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-sxw7n"}
+23:33:05 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-sxw7n"}
+23:33:05 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-f2vwv"}
+23:33:05 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-sxw7n"}
+23:33:05 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-f2vwv"}
+23:33:06 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-sxw7n"}
+23:33:06 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-f2vwv"}
+23:33:06 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-dsgj4"}
+23:33:06 | {"version":"v2.0.0","pod":"backend-v2-6b58c5fff9-dsgj4"}
+
+Останавливаю port-forward (pid 108841)

@@ -9,12 +9,12 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "${HERE}/.." && pwd)"
 
 echo "Удаляю v2 и возвращаю маршрут в namespace $NS ..."
+# Сначала переключаем маршрут на backend v1 (без удаления, чтобы не было 404)
+kubectl apply -f "${HERE}/strategies/rolling/httproute-backend.yaml"
 kubectl delete deployment backend-v2 -n "$NS" --ignore-not-found
 kubectl delete service backend-v2 -n "$NS" --ignore-not-found
-kubectl delete httproute backend -n "$NS" --ignore-not-found
 helm upgrade carlog "${ROOT}/helm/carlog" --namespace "$NS" --reuse-values \
   -f "${HERE}/strategies/rolling/01-app-v1.yaml"
-kubectl apply -f "${HERE}/strategies/rolling/httproute-backend.yaml"
 kubectl rollout status deploy/backend -n "$NS"
 echo "Готово. Gateway 'eg', ServiceMonitor и monitoring на месте."
 echo "Можно применять следующую стратегию."
